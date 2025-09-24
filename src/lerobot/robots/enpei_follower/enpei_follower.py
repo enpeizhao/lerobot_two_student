@@ -158,6 +158,9 @@ class EnpeiFollower(Robot):
             self.controller_right = EpisodeAPP(ip=self.config.ip_address_right, port=self.config.port_right)
             logging.info("Connected to EnpeiRobot controller")
 
+            self.controller_left.sync_motor_angles()
+            self.controller_right.sync_motor_angles()
+
             # 移到默认位置
             alpha = 60
             # 第二组位置
