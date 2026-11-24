@@ -60,7 +60,6 @@ class EnpeiFollower(Robot):
     def __init__(self, config: EnpeiFollowerConfig):
         super().__init__(config)
         self.config = config
-        self.controller = None
         self.episode1_is_connected = False
        
         self.cameras = make_cameras_from_configs(config.cameras)
@@ -139,10 +138,8 @@ class EnpeiFollower(Robot):
 
     @property
     def is_connected(self) -> bool:
-        return self.controller.is_connected and all(cam.is_connected for cam in self.cameras.values())
+        return self.episode1_is_connected and all(cam.is_connected for cam in self.cameras.values())
 
-    def move_to_default_position(self) -> None:
-        self.controller.move_to_default_position()
     def connect(self, calibrate: bool = True) -> None:
         """
         We assume that at connection time, arm is in a rest position,
@@ -430,6 +427,8 @@ class EnpeiFollower(Robot):
         # 因为dynamic_move是开环控制，所以在断开连接时，需要同步一次角度
         self.controller_left.sync_motor_angles()
         self.controller_right.sync_motor_angles()
+        self.controller_left._close_connection()
+        self.controller_right._close_connection()
 
         logger.info("已经断开机械臂的链接")
         self.episode1_is_connected = False
